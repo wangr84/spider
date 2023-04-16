@@ -141,13 +141,29 @@ public class CommentProcessor implements PageProcessor {
 
         List<String> nameList = page.getHtml().xpath(articleXpaths.get(0).nameXpath).all();
         List<String> dateList = page.getHtml().xpath(articleXpaths.get(0).dateXpath).all();
-        List<String> commentList = page.getHtml().xpath(articleXpaths.get(0).commentXpath).all();
+        List<String> commentStrList = page.getHtml().xpath(articleXpaths.get(0).commentXpath).all();
         List<String> ratingList = page.getHtml().xpath(articleXpaths.get(0).ratingXpath).all();
         List<String> titleList = page.getHtml().xpath(articleXpaths.get(0).titleXpath).all();
-        commentList = commentList.stream().filter(p->!p.contains("<i class")).collect(Collectors.toList());
+        List<String> commentList = commentStrList.stream().filter(p->!p.contains("<i class")).collect(Collectors.toList());
+        int index=0;
+        for(int i=0;i<commentStrList.size();i++){
+            String comStr = commentStrList.get(i);
+            if(StringUtils.isNotEmpty(comStr)){
+                if(comStr.contains("<i class") && i%2==0){
+                    index=i;
+                    break;
+                }
+            }
+        }
+
 //        if(nameList.size()>10){
         nameList= nameList.stream().distinct().collect(Collectors.toList());
 //        }
+        if(commentList.size()<nameList.size()){
+            for(int n=nameList.size()-commentList.size();n>0;n--) {
+                commentList.add(index/2, "");
+            }
+        }
 
         page.putField("nameList", nameList);
         page.putField("dateList", dateList);
