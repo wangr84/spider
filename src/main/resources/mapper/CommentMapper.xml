@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.dao.CommentMapper">
+  <insert id="batchInsertOrUpdate" parameterType="com.study.po.Comment">
+      INSERT INTO
+        comment(
+        id,
+        order_no,
+        url,
+        `name`,
+        title,
+        content,
+        rating,
+        create_time,
+        time_str,
+        in_time
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.orderNo},
+            #{item.url},
+            #{item.name},
+            #{item.title},
+            #{item.content},
+            #{item.rating},
+            #{item.createTime},
+            #{item.timeStr},
+            #{item.inTime}
+            )
+        </foreach>
+    </insert>
+
+<!--根据asin查询最新评论-->
+    <select id="getLastCommment" resultType="com.study.po.Comment">
+      select * from (
+		select *
+		from comment
+		<where>
+		  <if test="asin!=null and asin!=''">
+		   order_no=#{asin}
+		   </if>
+		</where>
+        order by create_time desc
+        ) tmp limit 0,1
+	</select>
+</mapper>
